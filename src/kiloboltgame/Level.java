@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class Level {
     private ArrayList<Tile> tilearray;
-    private ArrayList<CollidableObject> objectsarray;
+    private ArrayList<MapObject> objectsarray;
     private char tiles[][];
     private int width, height;
 
@@ -16,13 +16,13 @@ public class Level {
         this.width = width;
         this.height = 12;
         tilearray = new ArrayList<Tile>();
-        objectsarray = new ArrayList<CollidableObject>();
+        objectsarray = new ArrayList<MapObject>();
     }
     public Level() {
         this.width = 0;
         this.height = 12;
         tilearray = new ArrayList<Tile>();
-        objectsarray = new ArrayList<CollidableObject>();
+        objectsarray = new ArrayList<MapObject>();
     }
 
     public void start(String map) {
@@ -64,7 +64,6 @@ public class Level {
                 break;
             }
         }
-        height = lines.size()-1;
 
         for (int j = 0; j < height; j++) {
             String line = (String) lines.get(j);
@@ -91,22 +90,24 @@ public class Level {
             char chosenObject;
             String linesTemp[] = line.split(",");
 
-            chosenObject = (char)(Character.getNumericValue(linesTemp[0].charAt(0))+StartingClass.getNoTiles() + 48);
+            if (Character.getNumericValue(linesTemp[0].charAt(0))+StartingClass.getNoTiles() < 10)
+                chosenObject = (char)(Character.getNumericValue(linesTemp[0].charAt(0))+StartingClass.getNoTiles() + 48);
+            else
+                chosenObject = (char)(Character.getNumericValue(linesTemp[0].charAt(0))+StartingClass.getNoTiles() + 55);
+
             posX = Double.parseDouble(linesTemp[1]);
             posY = Double.parseDouble(linesTemp[2]);
-            objectsarray.add(new CollidableObject(posX, posY, chosenObject));
+            objectsarray.add(new MapObject(posX, posY, chosenObject));
         }
     }
 
     public void placeTile(char chosenTile, int posX, int posY) {
-        // Sprawdzanie, czy na tym miejscu jest już jakiś element
         boolean placeable = true;
         if (tilearray.size() > 0) {
             for (int i = 0; i < tilearray.size(); i++) {
                 if (tilearray.get(i).getTileX()/Tile.getWidth() == posX) {
                     if (tilearray.get(i).getTileY()/Tile.getWidth() == posY) {
                         placeable = false;
-                        //tilearray.remove(i); // To dam do usuniecia
                         break;
                     }
                 }
@@ -121,7 +122,6 @@ public class Level {
     }
 
     public void removeTile(int posX, int posY) {
-        // Sprawdzanie, czy na tym miejscu jest już jakiś element
         if (tilearray.size() > 0) {
             for (int i = 0; i < tilearray.size(); i++) {
                 if (tilearray.get(i).getTileX()/Tile.getWidth() == posX) {
@@ -136,28 +136,25 @@ public class Level {
     }
 
     public void placeObject(char chosenObject, int posX, int posY) {
-        // Sprawdzanie, czy na tym miejscu jest już jakiś element
         boolean placeable = true;
         if (objectsarray.size() > 0) {
             for (int i = 0; i < objectsarray.size(); i++) {
                 if (objectsarray.get(i).getPosX() == posX) {
                     if (objectsarray.get(i).getPosY() == posY) {
                         placeable = false;
-                        //tilearray.remove(i); // To dam do usuniecia
                         break;
                     }
                 }
             }
         }
         if (placeable) {
-            CollidableObject o = new CollidableObject(posX, posY, chosenObject);
+            MapObject o = new MapObject(posX, posY, chosenObject);
             objectsarray.add(o);
             System.out.println("placed");
         }
     }
-    //TODO REMOVE OBJECT
+
     public void removeObject(int posX, int posY) {
-        // Sprawdzanie, czy na tym miejscu jest już jakiś element
         if (objectsarray.size() > 0) {
             for (int i = 0; i < objectsarray.size(); i++) {
                 if (objectsarray.get(i).getPosX() == posX) {
@@ -197,9 +194,10 @@ public class Level {
         writer.write("###");
         for (int i = 0; i < objectsarray.size(); i++) {
             writer.write(System.lineSeparator());
-            if (objectsarray.get(i).getObjectType() == CollidableObject.ObjectType.BEER) writer.write(Integer.toString(1));
-            if (objectsarray.get(i).getObjectType() == CollidableObject.ObjectType.COIN) writer.write(Integer.toString(2));
-            if (objectsarray.get(i).getObjectType() == CollidableObject.ObjectType.ENEMY) writer.write(Integer.toString(3));
+            if (objectsarray.get(i).getObjectType() == MapObject.ObjectType.BEER) writer.write(Integer.toString(1));
+            if (objectsarray.get(i).getObjectType() == MapObject.ObjectType.COIN) writer.write(Integer.toString(2));
+            if (objectsarray.get(i).getObjectType() == MapObject.ObjectType.ENEMY) writer.write(Integer.toString(3));
+            if (objectsarray.get(i).getObjectType() == MapObject.ObjectType.DECORATION) writer.write(Integer.toString(objectsarray.get(i).getObjectNumber()));
 
             writer.write("," + Double.toString(objectsarray.get(i).getPosX()) + "," + Double.toString(objectsarray.get(i).getPosY()));
         }
@@ -216,7 +214,7 @@ public class Level {
     }
 
 
-    public ArrayList<CollidableObject> getObjectsarray() {
+    public ArrayList<MapObject> getObjectsarray() {
         return objectsarray;
     }
 }

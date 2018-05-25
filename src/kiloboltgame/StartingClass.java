@@ -20,7 +20,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
 	private Image image, background;
 
-	public static int noTiles = 6, noObjects = 3;
+	public static int noTiles = 6, noObjects = 3, noDecorations = 2;
     public static Image tiles[], objects[];
 
     private Graphics second;
@@ -33,8 +33,12 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 	private static boolean tileOrObject;
 
 	private Level level;
+
 	private Tile mouseTile;
-	private CollidableObject mouseObject;
+	private MapObject mouseObject;
+
+	private static int gameWidth = 800, gameHeight = 480;
+
 	private Button saveButton;
 
 	static Scanner scanner = new Scanner (System.in);
@@ -44,10 +48,10 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 	public void init() {
         chosenTile = '1';
         tileOrObject = true;
-		setSize(800, 480);
+		setSize(gameWidth, gameHeight);
 		scroll = 0; scrollM = 0; scrollSpeed = 0;
 		tiles = new Image[noTiles];
-		objects = new Image[noObjects];
+		objects = new Image[noObjects + noDecorations];
 
 		setBackground(Color.BLACK);
 		setFocusable(true);
@@ -65,7 +69,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 			for (int i = 0; i < noTiles; i++) { // TODO MAYBE BUG WITH noTiles
 				tiles[i] = getImage(new URL(baseString + "/data/tile"+Integer.toString(i+1)+".png"));
 			}
-			for (int i = 0; i < noObjects; i++) {
+			for (int i = 0; i < noObjects + noDecorations; i++) {
 				objects[i] = getImage(new URL(baseString + "/data/object"+Integer.toString(i+1)+".png"));
 			}
 		} catch (Exception e) {
@@ -78,7 +82,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 		bg1 = new Background(0, 0);
 		bg2 = new Background(Background.getWidth(), 0);
         mouseTile = new Tile (0, 0, chosenTile);
-        mouseObject = new CollidableObject (0, 0, '7');
+        mouseObject = new MapObject (0, 0, '7');
         saveButton = new Button (10, 10, 100, 20, "Zapisz mape");
 
 		System.out.println("\"nowa\" mapa czy \"edycja\"?");
@@ -128,7 +132,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
 		    if (scrollM % 40 == 0) scroll = scrollM;
             if (scroll < 0) scroll = 0;
-            if (scroll > level.getWidth()*Tile.getWidth()) scroll = Tile.getWidth()*level.getWidth();
+            if (scroll > level.getWidth()*Tile.getWidth() - gameWidth) scroll = Tile.getWidth()*level.getWidth() - gameWidth;
 		    level.update();
 			bg1.update();
 			bg2.update();
@@ -164,7 +168,10 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
 		if (tileOrObject)
         	g.drawImage(mouseTile.getTileImage(),  mouseTile.getTileX()/40 * 40, mouseTile.getTileY()/40 * 40, this);
-		else
+
+		paintObjects(g);
+
+		if (!tileOrObject)
 			g.drawImage(mouseObject.getObjectImage(),  (int)mouseObject.getPosX()/40 * 40, (int)mouseObject.getPosY()/40 * 40, this); //TODO WHY THE FUCK IS MOUSEOBJECT NOT WORKING
 
 		g.setColor(Color.LIGHT_GRAY);
@@ -178,8 +185,11 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 			Tile t = (Tile) level.getTilearray().get(i);
 			g.drawImage(t.getTileImage(), t.getTileX() - scroll, t.getTileY(), this);
 		}
+	}
+
+	private void paintObjects(Graphics g) {
 		for (int i = 0; i < level.getObjectsarray().size(); i++) {
-			CollidableObject o = (CollidableObject) level.getObjectsarray().get(i);
+			MapObject o = (MapObject) level.getObjectsarray().get(i);
 			g.drawImage(o.getObjectImage(), (int)o.getPosX() - scroll, (int)o.getPosY(), this);
 		}
 	}
@@ -223,8 +233,14 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 			case KeyEvent.VK_O:
 				chosenTile = '9';
 				break;
+			case KeyEvent.VK_P:
+				chosenTile = 'A';
+				break;
+			case KeyEvent.VK_A:
+				chosenTile = 'B';
+				break;
         }
-        if (Character.getNumericValue(chosenTile) <= 6)
+        if (Character.getNumericValue(chosenTile) <= noTiles)
 			mouseTile.setTileImage(tiles[Character.getNumericValue(chosenTile)-1]);
 		else
 			mouseObject.setObjectImage(objects[Character.getNumericValue(chosenTile)-1-noTiles]);
@@ -282,7 +298,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e) {
-		if (saveButton.pressButton(e.getX(), e.getY()) == false) {
+		if (!saveButton.pressButton(e.getX(), e.getY())) {
 
 			mousePosX = (e.getX() + scroll) / 40;
 			mousePosY = e.getY() / 40;
@@ -304,7 +320,7 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
     @Override
     public void mouseReleased(MouseEvent e) {
-		if (saveButton.pressButton(e.getX(), e.getY()) == true) {
+		if (saveButton.pressButton(e.getX(), e.getY())) {
 			System.out.println("Podaj sciezke do pliku do zapisu: ");
 			inVariable = scanner.nextLine();
 
@@ -315,8 +331,6 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 				// TODO Auto-generated catch block
 				exc.printStackTrace();
 			}
-
-
 		}
     }
 
@@ -340,6 +354,9 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
 	public static int getNoObjects() {
 		return noObjects;
+	}
+	public static int getNoDecorations() {
+		return noDecorations;
 	}
 
 }
