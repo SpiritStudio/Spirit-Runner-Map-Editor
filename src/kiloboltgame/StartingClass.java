@@ -60,7 +60,8 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
         addMouseMotionListener(this);
 		Frame frame = (Frame) this.getParent().getParent();
 		frame.setTitle("Map Editor");
-		baseString = new File("").getAbsolutePath();
+		//baseString = new File("").getAbsolutePath();
+		baseString = "X:/MapEditor/Spirit-Runner-Map-Editor";//TODO Issue
 		baseString = baseString.replace('\\', '/');
 		baseString = "file:/" + baseString + "/src/kiloboltgame/";
 		try {
@@ -162,8 +163,8 @@ public class StartingClass extends Applet implements Runnable, KeyListener, Mous
 
 	@Override
 	public void paint(Graphics g) {
-	    g.drawImage(background, bg1.getBgX() - scroll, bg1.getBgY(), this);
-		g.drawImage(background, bg2.getBgX() - scroll, bg2.getBgY(), this);
+	    g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
+		g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
 		paintTiles(g);
 
 		if (tileOrObject)

@@ -43,7 +43,8 @@ public class Level {
     private void loadMap(String filename) throws IOException {
         ArrayList lines = new ArrayList();
 
-        String filePath = new File("").getAbsolutePath();
+        //String filePath = new File("").getAbsolutePath();
+        String filePath = "X:/MapEditor/Spirit-Runner-Map-Editor";//TODO Issue
         filePath = filePath.replace('\\', '/');
         filePath = filePath + "/src/kiloboltgame/" + filename;
         System.out.println(filePath);
@@ -169,7 +170,8 @@ public class Level {
     }
 
     public void saveMap(String mapSrc) throws IOException {
-        String filePath = new File("").getAbsolutePath();
+        //String filePath = new File("").getAbsolutePath();
+        String filePath = "X:/MapEditor/Spirit-Runner-Map-Editor";//TODO Issue
         filePath = filePath.replace('\\', '/');
         filePath = filePath + "/src/kiloboltgame/" + mapSrc;
         System.out.println(filePath);

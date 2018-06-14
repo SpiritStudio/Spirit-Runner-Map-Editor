@@ -17,9 +17,9 @@ public class Background {
 	}
 
 	public void update() {
-		if (bgX - StartingClass.getScroll() <= -width){
+		/*if (bgX - StartingClass.getScroll() <= -width){
 			bgX = width + StartingClass.getScroll();
-		}
+		}*/
 	}
 
 	public int getBgX() {
